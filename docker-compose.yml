@@ -1,9 +1,3 @@
-mongo_connector:
-  build: ./mongo-connector
-  links:
-    - mongo:mongo.local
-    - neo4j:neo4j.local
-
 web:
   build: ./lamp-custom
   ports:
@@ -15,6 +9,7 @@ web:
   links:
     - mongo:mongo.local
     - neo4j:neo4j.local
+    - mongo_connector:mongo-connector.local
 
 mongo:
   image: mongo
@@ -30,3 +25,10 @@ neo4j:
     - "7474:7474"
   volumes:
     - /data-neo4j:/data
+
+mongo_connector:
+  build: ./mongo-connector
+  links:
+    - mongo:mongo.local
+    - neo4j:neo4j.local
+  command: python /usr/local/bin/mongo-connector -m mongo.local:27017 -t http://neo4j.local:7474/db/data -d neo4j_doc_manager 
