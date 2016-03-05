@@ -1,0 +1,32 @@
+mongo_connector:
+  build: ./mongo-connector
+  links:
+    - mongo:mongo.local
+    - neo4j:neo4j.local
+
+web:
+  build: ./lamp-custom
+  ports:
+    - "80:80"
+    - "3306:3306"
+  volumes:
+    - /lamp-www:/var/www/example.com/
+    - /lamp-mysql-data:/var/lib/mysql
+  links:
+    - mongo:mongo.local
+    - neo4j:neo4j.local
+
+mongo:
+  image: mongo
+  ports:
+    - "27017:27017"
+  volumes:
+    - /data-mongo:/mongo-data
+  command: mongod --replSet rs0
+
+neo4j:
+  image: neo4j
+  ports:
+    - "7474:7474"
+  volumes:
+    - /data-neo4j:/data
